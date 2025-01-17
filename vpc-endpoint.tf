@@ -14,4 +14,15 @@ resource "aws_vpc_endpoint" "s3" {
     Environment = "s3-static-web-internal-EP"
   }
 }
+output "eni_ids" {
+  value = tolist(aws_vpc_endpoint.s3.network_interface_ids)
+}
 
+data "aws_network_interface" "eni_info" {
+  count = length(aws_vpc_endpoint.s3.network_interface_ids)
+  id    = element(tolist(aws_vpc_endpoint.s3.network_interface_ids), count.index)
+}
+
+output "private_ips" {
+  value = data.aws_network_interface.eni_info[*].private_ip
+}

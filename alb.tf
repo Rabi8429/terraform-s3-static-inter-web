@@ -5,7 +5,7 @@ resource "aws_lb" "test" {
   security_groups    = [aws_security_group.allow_tls.id]
   subnets            = [aws_subnet.private-subnet-az1.id, aws_subnet.private-subnet-az2.id]
 
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   #   access_logs {
   #     bucket  = aws_s3_bucket.lb_logs.id

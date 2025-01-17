@@ -31,6 +31,16 @@ variable "internet_cidr" {
   description = "description"
 }
 variable "subnet_ids" {
-
   description = "description"
+}
+variable "client_cidr_block" {
+  
+  description = "description"
+}
+variable "server-certificatecert-arn" {
+type = string
+  
+}
+variable "root-certificate-arn" {
+  type = string
 }

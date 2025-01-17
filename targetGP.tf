@@ -1,5 +1,6 @@
 #### This for VPC endpoint private ips attached with Target Group ####################
 
+
 resource "aws_lb_target_group" "ip-base-TG" {
   name             = "s3-static-internal-web-tg"
   port             = 80
@@ -15,22 +16,33 @@ resource "aws_lb_target_group" "ip-base-TG" {
   }
   depends_on = [aws_vpc_endpoint.s3]
 }
-locals {
-  #   list_network_interface_ids = tolist(aws_vpc_endpoint.s3.network_interface_ids)
-  #   subnet_to_network_interface_map = {
-  #     for idx, subnet_id in var.subnet_ids : idx => local.list_network_interface_ids[idx]
-  #   }
-  network_interface_ids_sorted = sort(aws_vpc_endpoint.s3.network_interface_ids)
-}
+# locals {
+#   #   list_network_interface_ids = tolist(aws_vpc_endpoint.s3.network_interface_ids)
+#   #   subnet_to_network_interface_map = {
+#   #     for idx, subnet_id in var.subnet_ids : idx => local.list_network_interface_ids[idx]
+#   #   }
+#   network_interface_ids_sorted = sort(aws_vpc_endpoint.s3.network_interface_ids)
+# }
 # data "aws_network_interface" "example" {
 #   for_each = local.subnet_to_network_interface_map
 #   id       = each.value
 # }
-resource "aws_lb_target_group_attachment" "ip-base-attach" {
-  count = length(var.subnet_ids)
-  #for_each         = data.aws_network_interface.example
-  target_group_arn = aws_lb_target_group.ip-base-TG.arn
-  target_id        = local.network_interface_ids_sorted[count.index]
-  port             = 80
+# resource "aws_lb_target_group_attachment" "ip-base-attach" {
+#   count = length([aws_subnet.private-subnet-az1.id, aws_subnet.private-subnet-az2.id])
+#   #for_each         = data.aws_network_interface.example
+#   target_group_arn = aws_lb_target_group.ip-base-TG.arn
+#   target_id        = local.network_interface_ids_sorted[count.index]
+#   port             = 80
 
+# }
+
+locals {
+  network_interface_ids_sorted = sort(aws_vpc_endpoint.s3.network_interface_ids)
+}
+
+resource "aws_lb_target_group_attachment" "test" {
+  count = length(aws_vpc_endpoint.s3.network_interface_ids)
+  target_group_arn = aws_lb_target_group.ip-base-TG.arn
+  target_id        = data.aws_network_interface.eni_info[count.index].private_ip
+  port             = 80
 }
